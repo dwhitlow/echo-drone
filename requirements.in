@@ -1,0 +1,5 @@
+torch
+pynvml # dep of torch.cuda.device_properties
+transformers
+halo
+psutil

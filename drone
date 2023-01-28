@@ -1,0 +1,306 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+export PYTHONPATH="${SCRIPT_DIR}/src/"
+
+#
+# UTILITIES
+#
+
+ERROR_FORMAT="\033[91;1m" # bold bright red
+WARNING_FORMAT="\033[33;1m" # bold yellow
+INFO_FORMAT="\033[97;22m" # bright white
+CLEAR_FORMAT="\033[0m"
+
+log_msg() {
+  local format=$1
+  shift
+  echo -e "${format}$*${CLEAR_FORMAT}"
+}
+
+log_error() {
+  log_msg "${ERROR_FORMAT}" "$@"
+}
+
+log_warning() {
+  log_msg "${WARNING_FORMAT}" "$@"
+}
+
+log_info() {
+  log_msg "${INFO_FORMAT}" "$@"
+}
+
+activate_venv() {
+  . .venv/bin/activate
+  log_info "Activated virtual environment ${VIRTUAL_ENV}"
+}
+
+#
+# SUBCOMMANDS
+#
+
+
+# init
+subcmdsummary_init() {
+  echo "Initializes the development environment. Installs all necessary build tools and python dependencies"
+}
+
+subcmdusage_init() {
+  cat <<-EOS
+		Usage: drone init [--dev]
+
+    --dev   installs development dependencies
+EOS
+}
+
+subcmd_init() {
+  if [[ -v VIRTUAL_ENV ]] ; then
+    log_info "Active virtual environment detected. Deactivating..."
+    . deactivate
+  fi
+
+  log_info "Checking python version..."
+  if [[ "$(command -v python >/dev/null && (python -V | cut -d' ' -f1))" == "$(cat .python-version)" ]] ; then
+    log_warning "python is not installed or is the wrong version"
+
+    if [[ -n "$(which pyenv)" ]] ; then
+      log_warning "pyenv is not installed. It is recommended to install it with:"
+      log_warning "curl https://pyenv.run | bash"
+      exit 1
+    else
+      log_info "Installing python $(cat .python-version)..."
+      pyenv install "$(cat .python-version)"
+    fi
+  fi
+
+  log_info "Installing virtualenv..."
+  if [[ -z "$(pip list --format=freeze | grep "virtualenv==")" ]] ; then
+    pip install virtualenv
+  fi
+
+  log_info "Initializing virtual env..."
+  if [[ ! -d .venv ]] ; then
+    virtualenv .venv
+  fi
+  activate_venv
+
+  log_info "Installing pip-tools..."
+  if [[ -z "$(pip list --format=freeze | grep "pip-tools==")" ]] ; then
+    pip install pip-tools
+  fi
+
+  subcmd_gen_deps "$@"
+}
+
+
+# gen_deps
+subcmdsummary_gen_deps() {
+  echo "Generates or updates requirements.txt"
+}
+
+subcmdusage_gen_deps() {
+  cat <<-EOS
+		Usage: drone gen_deps [--dev]
+
+    --dev   installs development dependencies
+EOS
+}
+
+subcmd_gen_deps() {
+  activate_venv
+
+  if [[ -f "requirements.txt" ]] ; then
+    log_info "Upgrading packages in requirements.txt..."
+    pip-compile --upgrade
+    pip-compile requirements-dev.in --upgrade
+  else
+    log_info "Generating requirements.txt..."
+    pip-compile
+    pip-compile requirements-dev.in
+  fi
+
+  log_info "Installing dependencies..."
+  pip install -r requirements.txt
+  if [[ $# -gt 0 ]] && [[ "$1" == "--dev" ]] ; then
+    pip install -r requirements-dev.txt
+  fi
+}
+
+
+# upgrade_dep
+subcmdsummary_upgrade_dep() {
+  echo "Updates a specific package in requirements.txt"
+}
+
+subcmdusage_upgrade_dep() {
+  cat <<-EOS
+		Usage: drone upgrade_dep <package-name>
+EOS
+}
+
+subcmd_upgrade_dep() {
+  if [[ $# -ne 1 ]] ; then
+    subcmdusage_upgrade_dep
+    exit 1
+  fi
+
+  activate_venv
+
+  local pkg_name=$1
+  shift 1
+
+  log_info "Updating ${pkg_name}..."
+  pip-compile --resolver=backtracking --upgrade-package "${pkg_name}"
+}
+
+
+# lint
+subcmdsummary_lint() {
+  echo "Runs project linters"
+}
+
+subcmdusage_lint() {
+  cat <<-EOS
+		Usage: drone lint [file] [...]
+EOS
+}
+
+subcmd_lint() {
+  activate_venv
+  if [[ $# -gt 0 ]] ; then
+    isort "$@"
+    pylint "$@"
+  else
+    isort src/
+    pylint src/
+  fi
+}
+
+
+# test
+subcmdsummary_test() {
+  echo "Runs project tests"
+}
+
+subcmdusage_test() {
+  cat <<-EOS
+		Usage: drone test [test/case.py] [...]
+EOS
+}
+
+subcmd_test() {
+  activate_venv
+  if [[ $# -gt 0 ]] ; then
+    python -m unittest "$@"
+  else
+    python -m unittest discover -s tests/
+  fi
+}
+
+
+# console
+subcmdsummary_console() {
+  echo "Opens a Python console"
+}
+
+subcmd_console() {
+  activate_venv
+  python "$@"
+}
+
+
+# chat
+subcmdsummary_chat() {
+  echo "Starts the chatbot and connects it to console I/O"
+}
+
+subcmd_chat() {
+  activate_venv
+  python src/bot/language/processor.py "$@"
+}
+
+
+# download_chat_models
+subcmdsummary_download_chat_models() {
+  echo "Downloads all recommended conversation models"
+}
+
+subcmd_download_chat_models() {
+  activate_venv
+  python src/bot/language/conversation/model.py "$@"
+}
+
+
+# help
+subcmdsummary_help() {
+  echo "Print this help message or help for a specific subcommand"
+}
+subcmdusage_help() {
+  cat <<-EOS
+		Usage: drone help [subcommand]
+EOS
+}
+
+subcmd_help() {
+  if [[ $# -ne 1 ]] ; then
+    # Command summary
+    echo -e "Usage: $0 <subcommand>\n"
+    for subcmd in $(declare -F | grep "subcmd_" | sed -nr 's/^.*subcmd_(.*)$/\1/p') ; do
+      echo -e "${subcmd};$("subcmdsummary_${subcmd}")"
+    done | column -t -s';'
+
+  else
+    # Subcommand help
+    local subcmd=$1
+    local subcmd_fn="subcmd_${subcmd}"
+    shift
+
+    if [[ -z "$(declare -F "${subcmd_fn}")" ]] ; then
+      log_error "Unknown subcommand: ${subcmd}\n"
+      subcmd_help
+      exit 1
+    fi
+
+    "subcmdsummary_${subcmd}"
+    echo ""
+
+    if [[ -n "$(declare -F "subcmdusage_${subcmd}")" ]] ; then
+      "subcmdusage_${subcmd}"
+    else
+      echo "Usage: drone ${subcmd}"
+    fi
+  fi
+
+  echo ""
+}
+
+
+#
+# MAIN
+#
+
+
+main() (
+  if [[ $# -lt 1 ]] ; then
+    log_error "Wrong number of arguments\n"
+    subcmd_help
+    exit 1
+  fi
+
+  cd "${SCRIPT_DIR}"
+
+  local subcmd=$1
+  local subcmd_fn="subcmd_${subcmd}"
+  shift
+
+  if [[ -n "$(declare -F "${subcmd_fn}")" ]] ; then
+    "${subcmd_fn}" "$@"
+  else
+    log_error "Unknown subcommand: ${subcmd}\n"
+    subcmd_help "$@"
+    exit 1
+  fi
+)
+
+main "$@"
