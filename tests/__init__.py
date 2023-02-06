@@ -4,7 +4,12 @@ import sys
 import unittest
 import warnings
 
+from vcr.record_mode import RecordMode
+
 from bot import logger as root_logger
+
+# See README.md and https://vcrpy.readthedocs.io/en/latest/usage.html#record-modes
+VCR_RECORD_MODE = RecordMode(os.getenv('VCR_RECORD_MODE', 'none'))
 
 
 class EchoTestCase(unittest.TestCase):
@@ -22,7 +27,8 @@ class EchoTestCase(unittest.TestCase):
     root_logger.addHandler(handler)
 
     # Disable deprecation warnings
-    warnings.filterwarnings('ignore', category=DeprecationWarning)
+    warnings.filterwarnings('ignore', category=DeprecationWarning) # triggered by halo
+    warnings.filterwarnings('ignore', category=ResourceWarning) # triggered by spotify.py
 
     # Disable Halo spinners
     os.environ['HALO_STREAM'] = '/dev/null'

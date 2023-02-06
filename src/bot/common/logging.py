@@ -2,6 +2,8 @@ import logging
 import os
 from io import StringIO
 
+from requests import HTTPError, PreparedRequest, Response
+
 from bot.common.paths import find_latest_numbered_entry
 
 
@@ -50,6 +52,33 @@ def serialize_dict(d: dict, indent_level: int = 2) -> str:
     else:
       string_builder.write(f'{k}: {v}\n')
   return string_builder.getvalue().rstrip()
+
+
+def serialize_http_error(error: HTTPError) -> str:
+  """Serializes an error object from the requests lib"""
+  return (
+    f'{error!s}\n'
+    f'HTTP Request:\n{serialize_http_request(error.request)}\n'
+    f'HTTP Response:\n{serialize_http_response(error.response)}'
+  )
+
+
+def serialize_http_request(request: PreparedRequest) -> str:
+  """Serializes a request object from the requests lib"""
+  return (
+    f'{request.method} {request.url}\n'
+    f'Headers:\n{serialize_dict(request.headers)}\n'
+    f'Body: {request.body}'
+  )
+
+
+def serialize_http_response(response: Response) -> str:
+  """Serializes a response object from the requests lib"""
+  return (
+    f'{response.status_code} {response.reason}\n'
+    f'Headers:\n{serialize_dict(response.headers)}\n'
+    f'Body: {response.text}'
+  )
 
 
 def __console_io_filter(record: logging.LogRecord) -> int:

@@ -1,0 +1,4 @@
+fixtures/* linguist-generated
+fixtures/**/* linguist-generated
+models/* linguist-generated
+models/**/* linguist-generated

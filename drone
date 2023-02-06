@@ -36,6 +36,13 @@ activate_venv() {
   log_info "Activated virtual environment ${VIRTUAL_ENV}"
 }
 
+pip_install() {
+  if [[ -z "$(pip list --format=freeze | grep "^$1$")" ]] ; then
+    log_info "Installing Python package $(echo "$1" | cut -d'=' -f1)..."
+    pip install "$1"
+  fi
+}
+
 #
 # SUBCOMMANDS
 #
@@ -74,10 +81,7 @@ subcmd_init() {
     fi
   fi
 
-  log_info "Installing virtualenv..."
-  if [[ -z "$(pip list --format=freeze | grep "virtualenv==")" ]] ; then
-    pip install virtualenv
-  fi
+  pip_install virtualenv==20.17.1
 
   log_info "Initializing virtual env..."
   if [[ ! -d .venv ]] ; then
@@ -85,10 +89,11 @@ subcmd_init() {
   fi
   activate_venv
 
-  log_info "Installing pip-tools..."
-  if [[ -z "$(pip list --format=freeze | grep "pip-tools==")" ]] ; then
-    pip install pip-tools
-  fi
+  pip_install pip-tools==6.12.2
+
+  # snips-nlu build dependencies
+  pip_install setuptools-rust==1.5.2
+  pip_install Cython==0.29.33
 
   subcmd_gen_deps "$@"
 }
@@ -112,8 +117,8 @@ subcmd_gen_deps() {
 
   if [[ -f "requirements.txt" ]] ; then
     log_info "Upgrading packages in requirements.txt..."
-    pip-compile --upgrade
-    pip-compile requirements-dev.in --upgrade
+    pip-compile --resolver=backtracking --upgrade
+    pip-compile --resolver=backtracking --upgrade requirements-dev.in
   else
     log_info "Generating requirements.txt..."
     pip-compile
@@ -124,6 +129,15 @@ subcmd_gen_deps() {
   pip install -r requirements.txt
   if [[ $# -gt 0 ]] && [[ "$1" == "--dev" ]] ; then
     pip install -r requirements-dev.txt
+  fi
+
+  if [[ -z "$(ls .venv/lib/python3.11/site-packages/snips_nlu/data)" ]] ; then
+    # snips.ai SSL cert has been expired since Apr 2022. Mark as trusted host to allow downloads to succeed.
+    log_info "Downloading Snips NLU built-in entities..."
+    pip config set global.trusted-host "resources.snips.ai" --trusted-host=https://resources.snips.ai/
+    cat .venv/lib/python3.11/site-packages/snips_nlu/cli/utils.py | sed 's/requests.get(url)/requests.get(url, verify=False)/g' > /tmp/snips_nlu_cli_utils.py
+    mv /tmp/snips_nlu_cli_utils.py .venv/lib/python3.11/site-packages/snips_nlu/cli/utils.py
+    python -m snips_nlu download-language-entities en
   fi
 }
 
@@ -229,6 +243,17 @@ subcmdsummary_download_chat_models() {
 subcmd_download_chat_models() {
   activate_venv
   python src/bot/language/conversation/model.py "$@"
+}
+
+
+# train_assist
+subcmdsummary_train_assist() {
+  echo "Trains the AI assistant NLU engine"
+}
+
+subcmd_train_assist() {
+  activate_venv
+  python src/bot/language/assistant/train.py "$@"
 }
 
 

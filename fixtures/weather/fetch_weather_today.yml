@@ -1,0 +1,196 @@
+interactions:
+- request:
+    body: '[{"name": "getSunV3DailyForecastWithHeadersUrlConfig", "params": {"duration":
+      "15day", "geocode": "37.779,-122.42", "language": "en-US", "units": "e"}}]'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Accept-Language:
+      - en-US,en;q=0.5
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '152'
+      Content-Type:
+      - application/json
+      DNT:
+      - '1'
+      Origin:
+      - https://weather.com
+      Referer:
+      - https://weather.com/
+      Sec-Fetch-Dest:
+      - empty
+      Sec-Fetch-Mode:
+      - cors
+      Sec-Fetch-Site:
+      - same-origin
+      TE:
+      - trailers
+      User-Agent:
+      - 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101
+        Firefox/109.0'
+    method: POST
+    uri: https://weather.com/api/v1/p/redux-dal
+  response:
+    body:
+      string: !!binary |
+        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
+        Qwel3gAAAP//AwBwj7jJiTQAAA==
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - Accept, Authorization, Content-Type, If-None-Match, ETag, Cache-Control, If-None-Match,
+        Location, Referer, Status, Strict-Transport-Security, Set-Cookie, Cookie,
+        URI, User-Agent, Via, X-Forwarded-For
+      Access-Control-Allow-Methods:
+      - GET,POST,OPTIONS
+      Access-Control-Allow-Origin:
+      - weather.com
+      Access-Control-Max-Age:
+      - '86400'
+      Cache-Control:
+      - max-age=0, no-cache
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '3496'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 12 Feb 2023 21:40:13 GMT
+      ETag:
+      - W/"3489-ZjA9BQMusuq2sY056arOm0nrqTo"
+      Expires:
+      - Sun, 12 Feb 2023 21:40:13 GMT
+      Pragma:
+      - no-cache
+      Property-id:
+      - TWC-WX-Prod
+      Server-Timing:
+      - cdn-cache; desc=MISS
+      - edge; dur=3105
+      - origin; dur=58
+      - intid;desc=6a2404b9f6565957
+      Set-Cookie:
+      - speedpin=4G; expires=Sun, 12-Feb-2023 22:10:13 GMT; path=/; domain=.weather.com;
+        secure
+      - ci=TWC-Connection-Speed=4G&TWC-Locale-Group=US&TWC-Device-Class=desktop&X-Origin-Hint=PROD-IBM-redux-dal&TWC-Network-Type=wifi&TWC-GeoIP-Country=US&TWC-GeoIP-Lat=37.3519&TWC-GeoIP-Long=-121.952&Akamai-Connection-Speed=1000+&TWC-Privacy=usa-ccpa&TWC-GeoIP-DMA=807&TWC-GeoIP-City=SANTACLARA&TWC-GeoIP-Region=CA;
+        path=/; domain=.weather.com; secure
+      Strict-Transport-Security:
+      - max-age=15552000; preload
+      TWC-AK-Req-ID:
+      - 10bd30e
+      TWC-Connection-Speed:
+      - 4G
+      TWC-Device-Class:
+      - desktop
+      TWC-GeoIP-City:
+      - SANTACLARA
+      TWC-GeoIP-Country:
+      - US
+      TWC-GeoIP-DMA:
+      - '807'
+      TWC-GeoIP-LatLong:
+      - 37.3519,-121.952
+      TWC-GeoIP-Region:
+      - CA
+      TWC-Locale-Group:
+      - US
+      TWC-PATH-LOCALE:
+      - /
+      TWC-Privacy:
+      - usa-ccpa
+      TWC-Subs:
+      - none
+      TWC-Unit:
+      - u
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-DNS-Prefetch-Control:
+      - 'off'
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Origin-Hint:
+      - PROD-IBM-redux-dal
+      X-XSS-Protection:
+      - 1; mode=block
+      webcakes-app-name:
+      - redux-dal
+      webcakes-app-version:
+      - 1.0.0-5979a645a0
+      webcakes-region:
+      - sjc04
+    status:
+      code: 200
+      message: OK
+version: 1

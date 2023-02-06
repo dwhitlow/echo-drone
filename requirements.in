@@ -1,5 +1,9 @@
 torch
 pynvml # dep of torch.cuda.device_properties
 transformers
+snips-nlu
 halo
 psutil
+numpy==1.23.5 # Latest compatible version with snips-nlu
+requests
+git+https://github.com/mental32/spotify.py@v0.10.3

@@ -4,6 +4,7 @@
 *.pyc
 __pycache__
 
-data/*
-!data/**/.keep
+data/meta
+fixtures/music/
 logs/*
+secrets.json

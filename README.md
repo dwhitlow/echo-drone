@@ -26,10 +26,38 @@ sudo apt-get install -y \
   zlib1g-dev
 ```
 
-Run `./drone init --dev`. It validates your python version, installs required python build/env packages, and installs python package dependencies to a project-specific virtual environment.
+Run `./drone init`. It validates your python version, installs required python build/env packages, and installs python package dependencies to a project-specific virtual environment.
+
+## Assistant Integrations
+
+To leverage some of the AI assistant integrations, you will need to provide your own API credentials.
+
+First, create a file in the project root called `secrets.json`.
+
+### Spotify
+
+1. You must create an application in Spotify's [Developer Dashboard](https://developer.spotify.com/dashboard/applications).
+1. Edit the application's settings and add the following redirect URI: `http://localhost:8123/spotify/oauth2_code_callback`
+1. Copy the client ID/secret and write them to `secrets.json`:
+  ```json
+  {
+    "spotify": {
+      "client_id": "xxxx",
+      "client_secret": "xxxx"
+    }
+  }
+  ```
+
+When these secrets are set, a web browser window may pop up to authenticate you when the chatbot or AI assistant is initialized. If you are running this project on a device with limited I/O options, your options are a bit limited since Spotify does not allow public access to its OAuth2 device flow. You can work around these issues by authenticating on a different device, copying the `spotify.refresh_token` value from `secrets.json`, and then updating the secrets file on the original device.
 
 ## Usage
 
 Run `./drone help` for a full list of commands, but the core ones are:
 * `init`: initializes the project and installs necessary dependencies
 * `chat`: starts the chatbot with console input/output
+
+## Development / Testing
+
+Include the `--dev` flag when running `./drone init` and `./drone gen_deps`. This will install dev dependencies.
+
+To record only new network responses for tests, run `VCR_RECORD_MODE=once ./drone test`. To re-record network responses for tests, run `VCR_RECORD_MODE=all ./drone test`.

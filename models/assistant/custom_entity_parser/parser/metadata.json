@@ -1,0 +1,24 @@
+{
+  "parsers_metadata": [
+    {
+      "entity_identifier": "artist_name",
+      "entity_parser": "parser_1"
+    },
+    {
+      "entity_identifier": "attribute",
+      "entity_parser": "parser_2"
+    },
+    {
+      "entity_identifier": "device_name",
+      "entity_parser": "parser_3"
+    },
+    {
+      "entity_identifier": "playlist_name",
+      "entity_parser": "parser_4"
+    },
+    {
+      "entity_identifier": "track_name",
+      "entity_parser": "parser_5"
+    }
+  ]
+}

@@ -44,7 +44,7 @@ class ConversationModel(ABC):
 
   @timed_fn
   def __load_model(self, model_name: str) -> None:
-    with Halo(text='Loading model...', spinner='dots', stream=halo_stream()):
+    with Halo(text='Loading chat model...', spinner='dots', stream=halo_stream()):
       self.tokenizer = AutoTokenizer.from_pretrained(model_name)
       self.model = self._auto_model_class().from_pretrained(model_name)
 

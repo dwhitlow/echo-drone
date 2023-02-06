@@ -2,3 +2,4 @@
 isort
 mypy
 pylint
+vcrpy

@@ -29,7 +29,7 @@ def timed_fn(fn: callable) -> callable:
   return wrapped_fn
 
 
-def log_resource_usage(torch_device: torch.device) -> None:
+def log_resource_usage(torch_device: torch.device = None) -> None:
   """Logs memory used by this process. Does not include child processes."""
   try:
     proc = psutil.Process()
@@ -50,7 +50,7 @@ def log_resource_usage(torch_device: torch.device) -> None:
   except (psutil.AccessDenied, psutil.NoSuchProcess) as ex:
     logger.warning(f"Couldn't get process info for perf logging: {ex}")
 
-  if torch_device.type == 'cuda' and torch.cuda.is_available():
+  if torch_device is not None and torch_device.type == 'cuda' and torch.cuda.is_available():
     logger.debug(f'GPU utilization: {torch.cuda.utilization(torch_device)}%')
 
     alloc_gpu_mem = __bytes_human_readable(torch.cuda.memory_allocated(torch_device))
