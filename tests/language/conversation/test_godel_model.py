@@ -1,11 +1,10 @@
-import unittest
-
 import torch
 
 from bot.language.conversation.godel_model import GodelModel
+from tests import EchoTestCase
 
 
-class GodelModelTestCase(unittest.TestCase):
+class GodelModelTestCase(EchoTestCase):
   def test_converse(self) -> None:
     torch.manual_seed(0)
 

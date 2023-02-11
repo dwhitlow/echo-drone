@@ -1,11 +1,11 @@
 import os
 import tempfile
-import unittest
 
 from bot.common.paths import find_latest_numbered_entry
+from tests import EchoTestCase
 
 
-class PathsTestCase(unittest.TestCase):
+class PathsTestCase(EchoTestCase):
   def setUp(self) -> None:
     self.dir = tempfile.mkdtemp('drone-test-paths-')
 

@@ -194,7 +194,7 @@ subcmd_test() {
   if [[ $# -gt 0 ]] ; then
     python -m unittest "$@"
   else
-    python -m unittest discover -s tests/
+    python -m unittest discover --buffer -s tests/
   fi
 }
 

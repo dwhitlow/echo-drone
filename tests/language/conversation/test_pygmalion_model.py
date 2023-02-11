@@ -1,9 +1,8 @@
-import unittest
-
 from bot.language.conversation.pygmalion_model import PygmalionModel
+from tests import EchoTestCase
 
 
-class PygmalionModelTestCase(unittest.TestCase):
+class PygmalionModelTestCase(EchoTestCase):
   def test_converse(self) -> None:
     model = PygmalionModel(
       'PygmalionAI/pygmalion-1.3b',

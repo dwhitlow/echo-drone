@@ -1,9 +1,8 @@
-import unittest
-
 from bot.common.ansi import Code, escape
+from tests import EchoTestCase
 
 
-class AnsiTestCase(unittest.TestCase):
+class AnsiTestCase(EchoTestCase):
   def test_format(self) -> None:
     input = 'Test input'
     result = escape(input, Code.GREEN, Code.BOLD, Code.ITALIC)
